@@ -29,29 +29,19 @@ module Wow
                                                 fields: %w(items progression))
 
     return event.respond 'Character not found!' if character['status'] == 'nok'
-
-    event.respond "**Name:** #{character['name']}"
-    event.respond "**Class:** #{get_class(character['class'])}"
-    event.respond "**Faction:** #{get_faction(character['faction'])}"
-    event.respond "**iLVL:** (equipped) #{character['items']['averageItemLevelEquipped']} / (max) #{character['items']['averageItemLevel']}"
+    armory_url = "http://#{region}.battle.net/wow/en/character/#{realm}/#{name}/advanced"
+    event.respond "**Name:** #{character['name']}" \
+    "\n**Class:** #{get_class(character['class'])}" \
+    "\n**Faction:** #{get_faction(character['faction'])}" \
+    "\n**iLVL:** #{character['items']['averageItemLevelEquipped']} (equipped) / #{character['items']['averageItemLevel']}  (max)" \
+    "\n**Armory**: #{armory_url}"
   end
 
   def self.get_class(value)
-    possible_outcomes = {
-      1 => 'Warrior',
-      2 => 'Paladin',
-      3 => 'Hunter',
-      4 => 'Rogue',
-      5 => 'Priest',
-      6 => 'Death Knight',
-      7 => 'Shaman',
-      8 => 'Mage',
-      9 => 'Warlock',
-      10 => 'Monk',
-      11 => 'Druid',
-      12 => 'Demon Hunter'
-    }
-    possible_outcomes[value]
+    classes = ['Warrior', 'Paladin', 'Hunter', 'Rogue', 'Priest', \
+               'Death Knight', 'Shaman', 'Mage', 'Warlock', \
+               'Monk', 'Druid', 'Demon Hunter'].freeze
+    classes.at(value - 1)
   end
 
   def self.get_faction(value)

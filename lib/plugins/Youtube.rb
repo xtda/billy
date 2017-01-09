@@ -11,7 +11,7 @@ module Youtube
   def self.init(bot)
     @is_joined = false
     @is_playing = nil
-    @queue = Array.new()
+    @queue = []
     @voicebot = nil
     @is_paused = false
     @bot = bot
