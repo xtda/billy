@@ -1,0 +1,6 @@
+discord_token: ''
+discord_owner_id: ''
+command_prefix: '!'
+
+plugins:
+  - Core
