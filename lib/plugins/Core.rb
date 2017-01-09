@@ -14,4 +14,8 @@ module Core
     event.user.id
   end
 
+  command :plugins do |event|
+    $plugins.map { |p| "#{p.info}" }.join(', ')
+  end
+
 end

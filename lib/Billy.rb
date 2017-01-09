@@ -9,7 +9,6 @@ class Billy
       $plugins.push(p.constantize)
     end
     load_plugins
-
   end
 
   def run

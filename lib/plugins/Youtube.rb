@@ -5,7 +5,7 @@ module Youtube
   def self.info
     { name: 'Youtube Music Bot',
       author: 'xtda',
-      version: '0.0.1' }
+      version: '0.0.2' }
   end
 
   def self.init(bot)
