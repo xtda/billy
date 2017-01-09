@@ -20,16 +20,16 @@ module Youtube
   command :youtube, min_args: 1, max_args: 2 do |event, param, url|
     case param
     when 'play'
-      play(event, @bot)
+      play(event)
       break
     when 'pause'
-      pause(event, @bot)
+      pause
       break
     when 'add'
       add(event, url)
       break
     when 'remove'
-      remove(event,url)
+      remove(event, url)
     when 'stop'
       break
     when 'skip'
@@ -42,10 +42,10 @@ module Youtube
       queue(event)
       break
     when 'join'
-      join(event, @bot)
+      join(event)
       break
     when 'leave'
-      leave(event, @bot)
+      leave
       break
     end
   end
@@ -80,43 +80,43 @@ module Youtube
     event.respond response
   end
 
-  def self.play(event, bot)
+  def self.play(event)
     if @is_paused
       !@is_paused
       @voicebot.continue
-      bot.game = "#{@is_playing[:title]}"
+      @bot.game = "#{@is_playing[:title]}"
       return
     end
     loop do
       song = @queue.shift
       @is_playing = song
       event.respond "Now playing: **#{song[:title]}** added by #{song[:added_by]}"
-      bot.game = "#{song[:title]}"
+      @bot.game = "#{song[:title]}"
       @voicebot.play_file(song[:filename])
       break if @queue.length.zero?
     end
     @is_playing = nil
-    bot.game = nil
+    @bot.game = nil
     event.respond 'queue empty'
   end
 
-  def self.pause(event, bot)
+  def self.pause
     @voicebot.pause
     @is_paused = true
-    bot.game = "[paused] #{@is_playing[:title]}"
+    @bot.game = "[paused] #{@is_playing[:title]}"
   end
 
   def self.skip
     @voicebot.stop_playing
   end
 
-  def self.join(event, bot)
+  def self.join(event)
     if !event.user.voice_channel
       event.respond 'You are not in any voice channel'
       return
     end
     begin
-      @voicebot = bot.voice_connect(event.user.voice_channel)
+      @voicebot = @bot.voice_connect(event.user.voice_channel)
       @is_joined = true
     rescue StandardError => e
       puts "[ERROR] #{e.message}"
@@ -125,10 +125,10 @@ module Youtube
     @voicebot.volume = 0.35
   end
 
-  def self.leave(_event, bot)
+  def self.leave
     @voicebot.destroy
     @is_joined = false
     @is_playing = nil
-    bot.game = nil
+    @bot.game = nil
   end
 end
