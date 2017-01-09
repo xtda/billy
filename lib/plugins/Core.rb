@@ -6,7 +6,7 @@ module Core
       version: '0.0.2' }
   end
 
-  def self.init
+  def self.init(_bot)
 
   end
 
