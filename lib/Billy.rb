@@ -9,7 +9,6 @@ class Billy
       $plugins.push(p.constantize)
     end
     load_plugins
-
   end
 
   def run
@@ -22,7 +21,8 @@ class Billy
 
   def load_plugins
     $plugins.each do |plugin|
-      plugin.load(@bot)
+      @bot.include! plugin
+      plugin.init
     end
   end
 end
