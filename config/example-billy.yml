@@ -9,4 +9,3 @@ command_prefix: '!'
 Plugins: 
   - Core
   - SuperSimplePlugin
-
