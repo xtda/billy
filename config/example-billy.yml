@@ -1,3 +1,5 @@
+# See: https://discordapp.com/developers/applications/me for more information on generating a token and bot user
+
 discord_token: ''
 discord_application_id: ''
 discord_owner_id: ''
