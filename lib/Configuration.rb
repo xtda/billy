@@ -1,5 +1,5 @@
 module Configuration
-  def self.load
+  def self.init
     puts "[ERROR] Can't find the configuration file." unless 
     File.exist?('./config/billy.yml')
 

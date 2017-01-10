@@ -6,7 +6,7 @@ module Youtube
     { name: 'Youtube Music Bot',
       author: 'xtda',
       version: '0.0.2' }
-  end
+  end                                                     
 
   def self.init(bot)
     @is_joined = false
