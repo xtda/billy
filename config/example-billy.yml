@@ -1,6 +1,10 @@
 discord_token: ''
+discord_application_id: ''
 discord_owner_id: ''
+
 command_prefix: '!'
 
-plugins:
+Plugins: 
   - Core
+  - SuperSimplePlugin
+
