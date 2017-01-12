@@ -6,6 +6,6 @@ discord_owner_id: ''
 
 command_prefix: '!'
 
-Plugins: 
+plugins: 
   - Core
   - SuperSimplePlugin
