@@ -26,16 +26,17 @@ module Wow
   def self.get_character(event, name, realm, region = 'us')
     RBattlenet.set_region(region: region, locale: 'en_US')
     character = RBattlenet::Wow::Character.find(name: name, realm: realm,
-                                                fields: %w(items progression))
+                                                fields: %w(items progression guild achievements))
 
     return event.respond 'Character not found!' if character['status'] == 'nok'
     armory_url = "http://#{region}.battle.net/wow/en/character/#{realm}/#{name}/advanced"
     event.respond "**Details:**\n\n" \
     "**Name:** #{character['name']}" \
+    "\n**Guild:** #{character['guild']['name']}" \
     "\n**Class:** #{get_class(character['class'])}" \
     "\n**Faction:** #{get_faction(character['faction'])}" \
     "\n**iLVL:** #{character['items']['averageItemLevelEquipped']} (equipped) / #{character['items']['averageItemLevel']}  (max)" \
-    "\n\n**Progression:**\n\n#{get_progression(character)}" \
+    "\n\n**Progression:**\n\n#{get_progression(character['progression'])}" \
     "\n**Armory**: #{armory_url}" 
   end
 
@@ -43,22 +44,25 @@ module Wow
     classes = ['Warrior', 'Paladin', 'Hunter', 'Rogue', 'Priest', \
                'Death Knight', 'Shaman', 'Mage', 'Warlock', \
                'Monk', 'Druid', 'Demon Hunter'].freeze
-    classes.at(value-1)
+    classes.at(value - 1)
   end
 
   def self.get_faction(value)
     value.zero? ? 'Alliance' : 'Horde'
   end
 
-  def self.get_progression(input)
-    armory_progression = input['progression']
+  def self.get_kill_points(data)
+
+  end
+
+  def self.get_progression(armory_progression)
     progression = ''
 
     valid_raids = [
       'The Emerald Nightmare',
       'Trial of Valor',
       'The Nighthold'
-    ]
+    ].freeze
 
     armory_progression['raids'].each do |raid|
       valid_raids.each do |raids|

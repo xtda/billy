@@ -6,7 +6,7 @@ class Billy
                                                prefix: Configuration.data['command_prefix']
 
     Configuration.data['plugins'].each do |p|
-      $plugins.push(p.constantize)
+      $plugins.push(Object.const_get(p))
     end
     load_plugins
   end

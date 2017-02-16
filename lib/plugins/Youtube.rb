@@ -1,4 +1,5 @@
 require 'youtube-dl.rb'
+#require 'youtube_search'
 
 module Youtube
   extend Discordrb::Commands::CommandContainer
@@ -50,6 +51,11 @@ module Youtube
     end
   end
 
+  command :play do |event, *args|
+    search = args.join(' ')
+    event.respond "Searching for #{search}"
+  end
+
   def self.add(event, url)
     song = YoutubeDL.download url, extract_audio: true,
                                    output: './tmp/%(title)s.mp3',
@@ -96,6 +102,7 @@ module Youtube
       break if @queue.length.zero?
     end
     @is_playing = nil
+    @is_paused = true
     @bot.game = nil
     event.respond 'queue empty'
   end
