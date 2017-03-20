@@ -18,6 +18,14 @@ module Wow
 
     when 'armory'
       return event.respond 'Usage: !wow armory name realm region(optional)' unless args.length > 1
+
+      event.respond "Args: #{args}"
+
+      get_character(event, *args)
+      break
+
+    default
+      return event.respond 'Usage: !wow armory name realm region(optional)' unless args.length > 1
       get_character(event, *args)
       break
     end
@@ -30,6 +38,7 @@ module Wow
 
     return event.respond 'Character not found!' if character['status'] == 'nok'
     armory_url = "http://#{region}.battle.net/wow/en/character/#{realm}/#{name}/advanced"
+    wowprogress_url = "http://www.wowprogress.com/character/#{region}/#{realm}/#{name}"
     event.respond "**Details:**\n\n" \
     "**Name:** #{character['name']}" \
     "\n**Guild:** #{character['guild']['name']}" \
@@ -37,7 +46,8 @@ module Wow
     "\n**Faction:** #{get_faction(character['faction'])}" \
     "\n**iLVL:** #{character['items']['averageItemLevelEquipped']} (equipped) / #{character['items']['averageItemLevel']}  (max)" \
     "\n\n**Progression:**\n\n#{get_progression(character['progression'])}" \
-    "\n**Armory**: #{armory_url}" 
+    "\n**Armory**: #{armory_url}" \
+    "\n**Wowprogress**: #{wowprogress_url}"
   end
 
   def self.get_class(value)
