@@ -8,5 +8,4 @@ gem 'youtube-dl.rb'
 
 gem 'openssl', '>=2.0.3'
 gem 'json', '~> 2'
-gem 'httparty'
-gem 'rbattlenet'
+gem 'rest-client'

@@ -1,4 +1,6 @@
-require 'rbattlenet'
+require 'rest-client'
+require 'json'
+
 
 module Wow
   extend Discordrb::Commands::CommandContainer
@@ -9,8 +11,7 @@ module Wow
   end
 
   def self.init(_bot)
-    api_key = Configuration.data['bnet_api_key']
-    RBattlenet.authenticate(api_key: api_key)
+    @api_key = Configuration.data['bnet_api_key']
   end
 
   command :wow, min_args: 1 do |event, option, *args|
@@ -18,8 +19,6 @@ module Wow
 
     when 'armory'
       return event.respond 'Usage: !wow armory name realm region(optional)' unless args.length > 1
-
-      event.respond "Args: #{args}"
 
       get_character(event, *args)
       break
@@ -32,13 +31,14 @@ module Wow
   end
 
   def self.get_character(event, name, realm, region = 'us')
-    RBattlenet.set_region(region: region, locale: 'en_US')
-    character = RBattlenet::Wow::Character.find(name: name, realm: realm,
-                                                fields: %w(items progression guild achievements))
+    uri = URI::encode("https://#{region}.api.battle.net/wow/character/#{realm}/#{name}?fields=items,progression,guild,achievements&apikey=#{@api_key}")
+    request = RestClient.get(uri)
+    character = JSON.parse(request)
 
-    return event.respond 'Character not found!' if character['status'] == 'nok'
     armory_url = "http://#{region}.battle.net/wow/en/character/#{realm}/#{name}/advanced"
     wowprogress_url = "http://www.wowprogress.com/character/#{region}/#{realm}/#{name}"
+
+    return event.respond 'Character not found!' if character['status'] == 'nok'
     event.respond "**Details:**\n\n" \
     "**Name:** #{character['name']}" \
     "\n**Guild:** #{character['guild']['name']}" \
