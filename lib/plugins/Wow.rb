@@ -14,20 +14,8 @@ module Wow
     @api_key = Configuration.data['bnet_api_key']
   end
 
-  command :wow, min_args: 1 do |event, option, *args|
-    case option
-
-    when 'armory'
-      return event.respond 'Usage: !wow armory name realm region(optional)' unless args.length > 1
-
-      get_character(event, *args)
-      break
-
-    default
-      return event.respond 'Usage: !wow armory name realm region(optional)' unless args.length > 1
-      get_character(event, *args)
-      break
-    end
+  command :armory, min_args: 2,max_args: 3, description: 'Search the armory for a player', usage: '!armory name realm region(option)' do |event, *args|
+    get_character(event, *args)
   end
 
   def self.get_character(event, name, realm, region = 'us')
@@ -59,10 +47,6 @@ module Wow
 
   def self.get_faction(value)
     value.zero? ? 'Alliance' : 'Horde'
-  end
-
-  def self.get_kill_points(data)
-
   end
 
   def self.get_progression(armory_progression)

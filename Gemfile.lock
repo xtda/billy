@@ -1,3 +1,10 @@
+GIT
+  remote: https://github.com/xtda/youtube-dl.rb.git
+  revision: cd35983e0d15fde11572514faaecfdc7b0de4080
+  specs:
+    youtube-dl.rb (0.3.1.2016.09.11.1)
+      cocaine (>= 0.5.4)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -39,8 +46,6 @@ GEM
     websocket-client-simple (0.3.0)
       event_emitter
       websocket
-    youtube-dl.rb (0.3.1.2016.09.11.1)
-      cocaine (>= 0.5.4)
 
 PLATFORMS
   ruby
@@ -50,7 +55,7 @@ DEPENDENCIES
   json (~> 2)
   openssl (>= 2.0.3)
   rest-client
-  youtube-dl.rb
+  youtube-dl.rb!
 
 RUBY VERSION
    ruby 2.4.0p0

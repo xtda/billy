@@ -1,5 +1,5 @@
-require 'youtube-dl.rb'
-#require 'youtube_search'
+require 'json'
+require 'open3'
 
 module Youtube
   extend Discordrb::Commands::CommandContainer
@@ -16,44 +16,49 @@ module Youtube
     @voicebot = nil
     @is_paused = false
     @bot = bot
-  end
-
-  command :youtube, min_args: 1, max_args: 2 do |event, param, url|
-    case param
-    when 'play'
-      play(event)
-      break
-    when 'pause'
-      pause
-      break
-    when 'add'
-      add(event, url)
-      break
-    when 'remove'
-      remove(event, url)
-    when 'stop'
-      break
-    when 'skip'
-      skip
-      break
-    when 'status'
-      queue(event)
-      break
-    when 'queue'
-      queue(event)
-      break
-    when 'join'
-      join(event)
-      break
-    when 'leave'
-      leave
-      break
-    end
+   #@voicebot.volume = 0.35
   end
 
   command :play do |event, *args|
     search = args.join(' ')
-    event.respond "Searching for #{search}"
+    return event.respond 'I am not currently on any channel type !join to make me join' unless @is_joined
+    find_video(event, search)
+  end
+
+  command :add, help_available: false do |event,url|
+    add(event, url)
+  end
+
+  command :skip, help_available: false do |event|
+    skip(event)
+  end
+
+  command :pause, help_available: false do
+    pause_music
+  end
+
+  command :join, help_available: false do |event|
+    join(event)
+  end
+
+  command :leave, help_available: false do
+    leave
+  end
+
+  command :queue, help_available: false do |event|
+    queue(event)
+  end
+
+  command :status, help_available: false do |event|
+    status(event)
+  end
+
+  command :remove, help_available: false do |event,id|
+    remove(event, id)
+  end
+
+  command :volume, help_available: false do |event,vol|
+    set_volume(event, vol)
   end
 
   def self.add(event, url)
@@ -61,9 +66,23 @@ module Youtube
                                    output: './tmp/%(title)s.mp3',
                                    audio_format: 'mp3'
     data = { title: song.information[:title], filename: song.filename,
-             added_by: event.user.name } 
+             added_by: event.user.name }
     @queue.push(data)
     event.respond "Added **#{data[:title]}** to the queue."
+  end
+
+  def self.find_video(event, url)
+    cmd = "./vendor/bin/youtube-dl -x -o './tmp/%(title)s.mp3' --audio-format 'mp3' ytsearch:\"#{url}\" --no-color --no-progress  --print-json"
+    Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
+      if wait_thr.value.success?
+        @song = JSON.parse(stdout.read.to_s, symbolize_names: true)
+        data = { title: @song[:title], filename: @song[:_filename],
+               added_by: event.user.name }
+        @queue.push(data)
+        event.respond "Added **#{data[:title]}** to the queue."
+      end
+    end
+    play(event) unless @is_playing
   end
 
   def self.remove(event, number)
@@ -73,6 +92,11 @@ module Youtube
       event.respond 'Removed song'
       @queue.delete_at(number.to_i-1) unless number.to_i == -1
     end
+  end
+
+  def self.set_volume(event, vol)
+    @voicebot.volume = vol.to_f
+    event.respond "Volume set to #{vol}"
   end
 
   def self.queue(event)
@@ -107,14 +131,15 @@ module Youtube
     event.respond 'queue empty'
   end
 
-  def self.pause
+  def self.pause_music
     @voicebot.pause
     @is_paused = true
     @bot.game = "[paused] #{@is_playing[:title]}"
   end
 
-  def self.skip
+  def self.skip(event)
     @voicebot.stop_playing
+    event.respond 'Skipping song'
   end
 
   def self.join(event)
@@ -129,7 +154,7 @@ module Youtube
       puts "[ERROR] #{e.message}"
       @is_joined = false
     end
-    @voicebot.volume = 0.35
+    event.respond 'Joined channel'
   end
 
   def self.leave
