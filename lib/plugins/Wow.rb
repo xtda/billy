@@ -12,6 +12,7 @@ module Wow
 
   def self.init(_bot)
     @api_key = Configuration.data['bnet_api_key']
+
   end
 
   command :armory, min_args: 2,max_args: 3, description: 'Search the armory for a player', usage: '!armory name realm region(option)' do |event, *args|

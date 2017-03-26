@@ -16,7 +16,7 @@ module Youtube
     @voicebot = nil
     @is_paused = false
     @bot = bot
-   #@voicebot.volume = 0.35
+    @youtube_dl_bin = Configuration.data['youtube_dl_location']
   end
 
   command :play do |event, *args|
@@ -72,7 +72,7 @@ module Youtube
   end
 
   def self.find_video(event, url)
-    cmd = "./vendor/bin/youtube-dl -x -o './tmp/%(title)s.mp3' --audio-format 'mp3' ytsearch:\"#{url}\" --no-color --no-progress  --print-json"
+    cmd = "#{@youtube_dl_bin} -x -o './tmp/%(title)s.mp3' --audio-format 'mp3' ytsearch:\"#{url}\" --no-color --no-progress  --print-json"
     Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
       if wait_thr.value.success?
         @song = JSON.parse(stdout.read.to_s, symbolize_names: true)
