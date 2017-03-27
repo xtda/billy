@@ -1,4 +1,3 @@
-require 'json'
 require 'open3'
 
 module Youtube
@@ -7,7 +6,7 @@ module Youtube
     { name: 'Youtube Music Bot',
       author: 'xtda',
       version: '0.0.2' }
-  end                                                     
+  end
 
   def self.init(bot)
     @is_joined = false
@@ -19,14 +18,14 @@ module Youtube
     @youtube_dl_bin = Configuration.data['youtube_dl_location']
   end
 
-  command :play do |event, *args|
+  command :play , description: 'Add a song to queue', usage: '!play <link to youtube video> or search string' do |event, *args|
     search = args.join(' ')
     return event.respond 'I am not currently on any channel type !join to make me join' unless @is_joined
-    find_video(event, search)
-  end
-
-  command :add, help_available: false do |event,url|
-    add(event, url)
+    if @is_paused
+      play(event)
+    else
+      find_video(event, search)
+    end
   end
 
   command :skip, help_available: false do |event|
@@ -41,43 +40,30 @@ module Youtube
     join(event)
   end
 
-  command :leave, help_available: false do
-    leave
+  command :leave, help_available: false do |event|
+    leave(event)
   end
 
   command :queue, help_available: false do |event|
     queue(event)
   end
 
-  command :status, help_available: false do |event|
-    status(event)
-  end
-
-  command :remove, help_available: false do |event,id|
+  command :remove, help_available: false do |event, id|
     remove(event, id)
   end
 
-  command :volume, help_available: false do |event,vol|
+  command :volume, help_available: false do |event, vol|
     set_volume(event, vol)
   end
 
-  def self.add(event, url)
-    song = YoutubeDL.download url, extract_audio: true,
-                                   output: './tmp/%(title)s.mp3',
-                                   audio_format: 'mp3'
-    data = { title: song.information[:title], filename: song.filename,
-             added_by: event.user.name }
-    @queue.push(data)
-    event.respond "Added **#{data[:title]}** to the queue."
-  end
-
   def self.find_video(event, url)
-    cmd = "#{@youtube_dl_bin} -x -o './tmp/%(title)s.mp3' --audio-format 'mp3' ytsearch:\"#{url}\" --no-color --no-progress  --print-json"
-    Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
+    url.include?('https://www.youtube.com/') ? search = "#{url}" : search = "ytsearch:\"#{url}\""
+    cmd = "#{@youtube_dl_bin} -x -o './tmp/%(title)s.mp3' --audio-format 'mp3' --no-color --no-progress --no-playlist --print-json -f bestaudio/best --restrict-filenames -q --no-warnings -i --no-playlist #{search}"
+    Open3.popen3(cmd) do |_stdin, stdout, _stderr, wait_thr|
       if wait_thr.value.success?
-        @song = JSON.parse(stdout.read.to_s, symbolize_names: true)
-        data = { title: @song[:title], filename: @song[:_filename],
-               added_by: event.user.name }
+        song = JSON.parse(stdout.read.to_s, symbolize_names: true)
+        data = { title: song[:title], filename: song[:_filename],
+                 added_by: event.user.name }
         @queue.push(data)
         event.respond "Added **#{data[:title]}** to the queue."
       end
@@ -89,8 +75,8 @@ module Youtube
     if number == 'all'
       @queue = []
     else
+      @queue.delete_at(number.to_i - 1) unless number.to_i == -1
       event.respond 'Removed song'
-      @queue.delete_at(number.to_i-1) unless number.to_i == -1
     end
   end
 
@@ -157,10 +143,12 @@ module Youtube
     event.respond 'Joined channel'
   end
 
-  def self.leave
+  def self.leave(event)
+    @queue = []
     @voicebot.destroy
     @is_joined = false
     @is_playing = nil
     @bot.game = nil
+    event.respond 'Left channel'
   end
 end

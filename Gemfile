@@ -2,7 +2,6 @@ source 'https://rubygems.org'
 
 ruby '2.4.0'
 
-#gem 'i18n', '0.8.0'
 gem 'discordrb'
 
 gem 'openssl', '>=2.0.3'

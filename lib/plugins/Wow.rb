@@ -20,7 +20,7 @@ module Wow
   end
 
   def self.get_character(event, name, realm, region = 'us')
-    uri = URI::encode("https://#{region}.api.battle.net/wow/character/#{realm}/#{name}?fields=items,progression,guild,achievements&apikey=#{@api_key}")
+    uri = URI.encode("https://#{region}.api.battle.net/wow/character/#{realm}/#{name}?fields=items,progression,guild,achievements&apikey=#{@api_key}")
     request = RestClient.get(uri)
     character = JSON.parse(request)
 
@@ -73,7 +73,7 @@ module Wow
               @normal_progress += 1
             end
           end
-        progression += "**#{raid['name']}:** (N) #{@normal_progress} / #{raid['bosses'].length} (H) #{@heroic_progress} / #{raid['bosses'].length} (M) #{@mythic_progress} / #{raid['bosses'].length}\n"
+        progression += "**#{raid['name']}:** #{@normal_progress} / #{raid['bosses'].length} (N) #{@heroic_progress} / #{raid['bosses'].length} (H) #{@mythic_progress} / #{raid['bosses'].length} (M)\n"
         end
       end
       @normal_progress = 0
