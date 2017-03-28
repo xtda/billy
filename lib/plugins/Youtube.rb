@@ -18,7 +18,7 @@ module Youtube
     @youtube_dl_bin = Configuration.data['youtube_dl_location']
   end
 
-  command :play , description: 'Add a song to queue', usage: '!play <link to youtube video> or search string' do |event, *args|
+  command :play, description: 'Add a song to queue', usage: '!play <link to youtube video> or search string' do |event, *args|
     search = args.join(' ')
     return event.respond 'I am not currently on any channel type !join to make me join' unless @is_joined
     if @is_paused
@@ -112,7 +112,7 @@ module Youtube
       break if @queue.length.zero?
     end
     @is_playing = nil
-    @is_paused = true
+    @is_paused = false
     @bot.game = nil
     event.respond 'queue empty'
   end

@@ -1,6 +1,4 @@
 require 'rest-client'
-require 'json'
-
 
 module Wow
   extend Discordrb::Commands::CommandContainer
@@ -15,10 +13,11 @@ module Wow
 
   end
 
-  command :armory, min_args: 2,max_args: 3, description: 'Search the armory for a player', usage: '!armory name realm region(option)' do |event, *args|
+  command :armory, min_args: 2, max_args: 3, description: 'Search the armory for a player', usage: '!armory name realm region(option)' do |event, *args|
     get_character(event, *args)
   end
 
+  command :wcl, min_args: 1, max_args: 3
   def self.get_character(event, name, realm, region = 'us')
     uri = URI.encode("https://#{region}.api.battle.net/wow/character/#{realm}/#{name}?fields=items,progression,guild,achievements&apikey=#{@api_key}")
     request = RestClient.get(uri)

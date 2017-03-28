@@ -6,8 +6,8 @@ module Core
       version: '0.0.2' }
   end
 
-  def self.init(_bot)
-
+  def self.init(bot)
+    bot.set_user_permission(Configuration.data['discord_owner_id'], 999)
   end
 
   command :id do |event|
