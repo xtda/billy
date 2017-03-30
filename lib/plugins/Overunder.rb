@@ -11,15 +11,25 @@ module Overunder
 
   end
 
+  class OverUnderPlayer < Sequel::Model
+    def self.find_player(id)
+      find(discord_id: id) || create(discord_id: id)
+    end
+  end
 
-  command :ou, description: 'Play a game of over under', usage: '!ou under/over/seven' do |event, over|
+  command :ou, min_args: 2, description: 'Play a game of over under', usage: '!ou under/over/seven' do |event, over, bet|
+    player = OverUnderPlayer.find_player(event.user.id)
+    return event.respond "Bet must be lower then #{player.balance}" unless bet.to_i < player.balance
+    return event.respond 'Bet must be greater then 1' if bet.to_i < 1
+
     dice = roll_dice
     event.respond "Dice rolls: #{dice[0]} & #{dice[1]}\nTotal was: #{dice_total(dice)}\nRoll was: #{check_over_under(dice)}"
     return event.respond '**You Won**' if check_win(dice, over)
   end
 
-  command :status do |event, *args|
-
+  command :status do |event|
+    player = OverUnderPlayer.find_player(event.user.id)
+    event.respond "Current balance: #{player.balance}"
   end
 
   def self.roll_dice
