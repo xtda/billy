@@ -15,6 +15,10 @@ module Overunder
     def self.find_player(id)
       find(discord_id: id) || create(discord_id: id)
     end
+
+    def update_balance(balance)
+      update(balance: balance)
+    end
   end
 
   command :ou, min_args: 2, description: 'Play a game of over under', usage: '!ou under/over/seven' do |event, over, bet|
@@ -24,7 +28,20 @@ module Overunder
 
     dice = roll_dice
     event.respond "Dice rolls: #{dice[0]} & #{dice[1]}\nTotal was: #{dice_total(dice)}\nRoll was: #{check_over_under(dice)}"
-    return event.respond '**You Won**' if check_win(dice, over)
+    #return event.respond '**You Won**' if check_win(dice, over)
+    if check_win(dice, over)
+      win_amount = check_win_amount(over, bet.to_i)
+      new_balance = win_amount + player.balance
+      player.update_balance(new_balance)
+      event.respond "**You Won** #{win_amount}\n" \
+                    "**New balance:** #{new_balance}"
+    else
+      new_balance =  player.balance - bet.to_i
+      player.update_balance(new_balance)
+      event.respond "**You lost** #{bet.to_i}\n" \
+                    "**New balance**: #{new_balance}"
+    end
+    
   end
 
   command :status do |event|
@@ -48,7 +65,12 @@ module Overunder
   end
 
   def self.check_win(dice, option)
-    return true if check_over_under(dice) == option
+    true if check_over_under(dice) == option
+  end
+
+  def self.check_win_amount(rolled, bet)
+    (bet * 2 if rolled == 'seven')
+    bet * 2
   end
 end
 
