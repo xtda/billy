@@ -8,7 +8,7 @@ class Billy
     Configuration.data['plugins'].each do |p|
       $plugins.push(Object.const_get(p))
     end
-    
+
     load_plugins
   end
 
