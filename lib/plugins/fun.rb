@@ -14,17 +14,17 @@ module Fun
 
   def self.humanize(secs)
     [[60, :seconds], [60, :minutes], [24, :hours], [1000, :days]].map{ |count, name|
-        if secs > 0
-          secs, n = secs.divmod(count)
-          "#{n.to_i} #{name}"
-        end
+      if secs.positive? #> 0
+        secs, n = secs.divmod(count)
+        "#{n.to_i} #{name}"
+      end
     }.compact.reverse.join(' ')
   end
 
   command :d3 do |event|
-    season_start = Time.new(2017, 04, 01, 11, 00, 00, '+11:00')
+    season_start = Time.new(2017, 4, 1, 11, 0, 0, '+11:00')
     current_time = Time.now
-    return even.respond 'THE SEASON HAS STARTED!' unless ((season_start - current_time).to_i) > 1
+    return even.respond 'THE SEASON HAS STARTED!' unless (season_start - current_time).to_i > 1
     event.respond "ztr will miss the start of the D3 season because he has to work in: #{humanize((season_start - current_time).to_i)}"
 
   end
