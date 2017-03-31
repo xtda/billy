@@ -14,9 +14,9 @@ require 'sqlite3'
 
 $plugins = []
 
-require_relative './Billy.rb'
-require_relative './Configuration.rb'
-require_relative './Database.rb'
+require_relative './billy.rb'
+require_relative './configuration.rb'
+require_relative './database.rb'
 
 Database.init
 Configuration.init

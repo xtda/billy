@@ -1,4 +1,4 @@
-require_relative 'lib/Init.rb'
+require_relative 'lib/init.rb'
 
 billy = Billy.new
 
