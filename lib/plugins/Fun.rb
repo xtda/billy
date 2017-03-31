@@ -25,7 +25,7 @@ module Fun
     season_start = Time.new(2017, 04, 01, 11, 00, 00, '+11:00')
     current_time = Time.now
     return even.respond 'THE SEASON HAS STARTED!' unless ((season_start - current_time).to_i) > 1
-    event.respond "D3 Season starts in: #{humanize((season_start - current_time).to_i)}"
+    event.respond "ztr will miss the start of the D3 season because he has to work in: #{humanize((season_start - current_time).to_i)}"
 
   end
 

@@ -23,25 +23,24 @@ module Overunder
 
   command :ou, min_args: 2, description: 'Play a game of over under', usage: '!ou under/over/seven' do |event, over, bet|
     player = OverUnderPlayer.find_player(event.user.id)
-    return event.respond "Bet must be lower then #{player.balance}" unless bet.to_i < player.balance
-    return event.respond 'Bet must be greater then 1' if bet.to_i < 1
+    return event.respond 'noob' if player.balance < 1
+    return event.respond "Bet must be lower than #{player.balance}" unless bet.to_i <= player.balance
+    return event.respond 'Bet must be greater than 1' if bet.to_i < 1
 
     dice = roll_dice
     event.respond "Dice rolls: #{dice[0]} & #{dice[1]}\nTotal was: #{dice_total(dice)}\nRoll was: #{check_over_under(dice)}"
-    #return event.respond '**You Won**' if check_win(dice, over)
     if check_win(dice, over)
       win_amount = check_win_amount(over, bet.to_i)
-      new_balance = win_amount + player.balance
-      player.update_balance(new_balance)
-      event.respond "**You Won** #{win_amount}\n" \
+      new_balance = (win_amount - bet.to_i) + player.balance
+      response = "**You Won** #{win_amount}\n" \
                     "**New balance:** #{new_balance}"
     else
-      new_balance =  player.balance - bet.to_i
-      player.update_balance(new_balance)
-      event.respond "**You lost** #{bet.to_i}\n" \
+      new_balance = player.balance - bet.to_i
+      response = "**You lost** #{bet.to_i}\n" \
                     "**New balance**: #{new_balance}"
     end
-    
+    player.update_balance(new_balance)
+    event.respond "#{response}"
   end
 
   command :status do |event|
@@ -69,7 +68,7 @@ module Overunder
   end
 
   def self.check_win_amount(rolled, bet)
-    (bet * 2 if rolled == 'seven')
+    return bet * 4 if rolled == 'seven'
     bet * 2
   end
 end
