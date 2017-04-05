@@ -43,9 +43,15 @@ module Overunder
     event.respond "#{response}"
   end
 
-  command :status do |event|
+  command :balance do |event|
     player = OverUnderPlayer.find_player(event.user.id)
     event.respond "Current balance: #{player.balance}"
+  end
+
+  command :reset do |event|
+    player = OverUnderPlayer.find_player(event.user.id)
+    player.update_balance(1000)
+    event.respond "Your balance has been reset to 1000"
   end
 
   def self.roll_dice
