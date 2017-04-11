@@ -17,7 +17,7 @@ module Overunder
     end
 
     def update_balance(balance)
-      update(balance: balance)
+      update(balance: balance, last_reset: Time.now)
     end
   end
 
@@ -48,10 +48,13 @@ module Overunder
     event.respond "Current balance: #{player.balance}"
   end
 
-  command :reset do |event|
+  command :give do |event|
     player = OverUnderPlayer.find_player(event.user.id)
-    player.update_balance(1000)
-    event.respond "Your balance has been reset to 1000"
+    last_reset = ((Time.now - player.last_reset) / 3600).round
+    return event.respond "Please try again in #{3 - last_reset} hours" unless last_reset > 3
+    new_balance = player.balance + 1_000_000
+    player.update_balance(new_balance)
+    event.respond "Your balance has been set to #{new_balance}"
   end
 
   def self.roll_dice
