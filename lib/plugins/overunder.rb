@@ -8,7 +8,7 @@ module Overunder
   end
 
   def self.init(_bot)
-
+    @bot_channel = 'bot'
   end
 
   class OverUnderPlayer < Sequel::Model
@@ -16,12 +16,12 @@ module Overunder
       find(discord_id: id) || create(discord_id: id)
     end
 
-    def update_balance(balance)
-      update(balance: balance, last_reset: Time.now)
+    def update_balance(balance, time = false)
+      time ? update(balance: balance, last_reset: Time.now) : update(balance: balance)
     end
   end
 
-  command :ou, min_args: 2, description: 'Play a game of over under', usage: '!ou under/over/seven' do |event, over, bet|
+  command [:ou, :under, :overunder, :over], min_args: 2, description: 'Play a game of over under', usage: '!ou under/over/seven', channels: ['bot'] do |event, over, bet|
     player = OverUnderPlayer.find_player(event.user.id)
     return event.respond 'noob' if player.balance < 1
     return event.respond "Bet must be lower than #{player.balance}" unless bet.to_i <= player.balance
@@ -43,17 +43,27 @@ module Overunder
     event.respond "#{response}"
   end
 
-  command :balance do |event|
+  command :balance, channels: ['bot'] do |event|
     player = OverUnderPlayer.find_player(event.user.id)
     event.respond "Current balance: #{player.balance}"
   end
 
-  command :give do |event|
+  def self.humanize(secs)
+    [[60, :seconds], [60, :minutes], [24, :hours], [1000, :days]].map{ |count, name|
+        if secs > 0
+          secs, n = secs.divmod(count)
+          "#{n.to_i} #{name}"
+        end
+    }.compact.reverse.join(' ')
+  end
+
+  command :give, channels: ['bot'] do |event|
     player = OverUnderPlayer.find_player(event.user.id)
-    last_reset = ((Time.now - player.last_reset) / 3600).round
-    return event.respond "Please try again in #{3 - last_reset} hours" unless last_reset > 3
+    last_reset = ((Time.now - player.last_reset) / 3600)
+    puts "Last requested: #{last_reset}"
+    return event.respond "Please try again in #{humanize((108_00 - (Time.now - player.last_reset)))}" unless last_reset > 3
     new_balance = player.balance + 1_000_000
-    player.update_balance(new_balance)
+    player.update_balance(new_balance, true)
     event.respond "Your balance has been set to #{new_balance}"
   end
 

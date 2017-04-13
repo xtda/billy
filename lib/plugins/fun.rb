@@ -12,23 +12,6 @@ module Fun
     @yo_momma_api_endpoint = 'http://api.yomomma.info/'.freeze
   end
 
-  def self.humanize(secs)
-    [[60, :seconds], [60, :minutes], [24, :hours], [1000, :days]].map{ |count, name|
-      if secs.positive? #> 0
-        secs, n = secs.divmod(count)
-        "#{n.to_i} #{name}"
-      end
-    }.compact.reverse.join(' ')
-  end
-
-  command :d3 do |event|
-    season_start = Time.new(2017, 4, 1, 11, 0, 0, '+11:00')
-    current_time = Time.now
-    return even.respond 'THE SEASON HAS STARTED!' unless (season_start - current_time).to_i > 1
-    event.respond "ztr will miss the start of the D3 season because he has to work in: #{humanize((season_start - current_time).to_i)}"
-
-  end
-
   message contains: 'yo momma' do |event|
     request = RestClient.get(URI.encode(@yo_momma_api_endpoint))
     joke = JSON.parse(request)
@@ -47,6 +30,10 @@ module Fun
 
   message contains: /^Billy$/i do |event|
     event.respond 'what?'
+  end
+
+  message contains: /jewfish/i do |event|
+    event.respond 'jewfish? did you mean Pharma?'
   end
 
   message with_text: 'woah clam down' do |event|
