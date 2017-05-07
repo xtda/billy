@@ -27,9 +27,10 @@ module Wow
     wowprogress_url = "http://www.wowprogress.com/character/#{region}/#{realm}/#{name}"
 
     return event.respond 'Character not found!' if character['status'] == 'nok'
+    character.include?('guild') ? guild_string = "\n**Guild:** #{character['guild']['name']}" : guild_string = ''
     event.respond "**Details:**\n\n" \
     "**Name:** #{character['name']}" \
-    "\n**Guild:** #{character['guild']['name']}" \
+    "#{guild_string}" \
     "\n**Class:** #{get_class(character['class'])}" \
     "\n**Faction:** #{get_faction(character['faction'])}" \
     "\n**iLVL:** #{character['items']['averageItemLevelEquipped']} (equipped) / #{character['items']['averageItemLevel']}  (max)" \

@@ -59,7 +59,8 @@ module Youtube
   def self.find_video(event, url)
     url.include?('https://www.youtube.com/') ? search = "#{url}" : search = "ytsearch:\"#{url}\""
     cmd = "#{@youtube_dl_bin} -x -o './tmp/%(title)s.mp3' --audio-format 'mp3' --no-color --no-progress --no-playlist --print-json -f bestaudio/best --restrict-filenames -q --no-warnings -i --no-playlist #{search}"
-    Open3.popen3(cmd) do |_stdin, stdout, _stderr, wait_thr|
+    Open3.popen3(cmd) do |_stdin, stdout, stderr, wait_thr|
+
       if wait_thr.value.success?
         song = JSON.parse(stdout.read.to_s, symbolize_names: true)
         data = { title: song[:title], filename: song[:_filename],
@@ -67,6 +68,7 @@ module Youtube
         @queue.push(data)
         event.respond "Added **#{data[:title]}** to the queue."
       end
+      puts "stderr is:" + stderr.read
     end
     play(event) unless @is_playing
   end
